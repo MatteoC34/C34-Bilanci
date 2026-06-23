@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { ArrowLeft, Cloud, FileSpreadsheet, FileText, Loader2, Play, Upload as UploadIcon, AlertCircle, ExternalLink, KeyRound, Trash2 } from "lucide-react";
 import { AdminShell } from "@/components/admin-shell";
 import { useRequireAuth } from "@/hooks/use-me";
@@ -283,7 +283,7 @@ function UploadPage() {
               {files.map((f) => {
                 const isExcel = /\.(xlsx|xls|csv)$/i.test(f.file_name);
                 return (
-                  <React.Fragment key={f.id}>
+                  <Fragment key={f.id}>
                   <tr className="border-b border-border/60">
                     <td className="py-2 px-3">
                       <input
@@ -328,7 +328,7 @@ function UploadPage() {
                       </td>
                     </tr>
                   )}
-                  </React.Fragment>
+                  </Fragment>
                 );
               })}
             </tbody>
