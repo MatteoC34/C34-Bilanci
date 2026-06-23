@@ -5,6 +5,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { getMe } from "@/lib/portal.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -30,10 +32,23 @@ function Landing() {
   });
 
   useEffect(() => {
-    if (meQ.data) {
+    if (meQ.data && (meQ.data.isAdmin || meQ.data.isClient)) {
       navigate({ to: meQ.data.isAdmin ? "/admin/clienti" : "/dashboard/overview" });
     }
   }, [meQ.data, navigate]);
+
+  async function claimAdmin() {
+    const { data, error } = await supabase.rpc("claim_first_admin");
+    if (error) return toast.error(error.message);
+    if (data === true) {
+      toast.success("Sei ora amministratore");
+      window.location.reload();
+    } else {
+      toast.error("Un amministratore esiste già. Chiedi un invito allo Studio.");
+    }
+  }
+
+  const signedInWithoutRole = !!meQ.data && !meQ.data.isAdmin && !meQ.data.isClient;
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
@@ -50,10 +65,16 @@ function Landing() {
           <p className="text-muted-foreground">
             Dashboard finanziaria, KPI in tempo reale, pianificazione fiscale e note dal consulente — tutto in un unico portale.
           </p>
-          <div className="flex justify-center gap-3">
+          <div className="flex flex-col items-center gap-3">
             <Link to="/auth" className="inline-flex h-10 px-5 items-center justify-center rounded-md bg-primary text-primary-foreground font-medium hover:bg-primary/90">
               Accedi al portale
             </Link>
+            {signedInWithoutRole && (
+              <div className="text-xs text-muted-foreground">
+                Hai effettuato l'accesso ma non hai ancora un ruolo.
+                <Button variant="link" size="sm" onClick={claimAdmin}>Attiva come amministratore (primo accesso)</Button>
+              </div>
+            )}
           </div>
         </div>
       </main>
