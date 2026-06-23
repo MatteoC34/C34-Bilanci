@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Fragment } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ClientShell } from "@/components/client-shell";
@@ -52,7 +53,7 @@ function CE() {
               {Object.entries(grouped).map(([sezione, items]) => {
                 const total = items.reduce((s, i) => s + Number(i.saldo ?? 0), 0);
                 return (
-                  <React.Fragment key={sezione}>
+                  <Fragment key={sezione}>
                     <tr className="bg-muted/40">
                       <td colSpan={3} className="py-2 px-3 font-semibold text-xs uppercase tracking-wider">{sezione}</td>
                     </tr>
@@ -71,7 +72,7 @@ function CE() {
                         {fmt(total)}
                       </td>
                     </tr>
-                  </React.Fragment>
+                  </Fragment>
                 );
               })}
             </tbody>
