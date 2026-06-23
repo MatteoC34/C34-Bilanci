@@ -22,6 +22,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { PageCard } from "@/components/page-card";
@@ -393,7 +394,6 @@ function EditClientDialog({ client }: { client: ClientRow }) {
 }
 
 function DeleteClientDialog({ id, name }: { id: string; name: string }) {
-  const [open, setOpen] = useState(false);
   const del = useServerFn(deleteClient);
   const qc = useQueryClient();
   const m = useMutation({
@@ -401,21 +401,21 @@ function DeleteClientDialog({ id, name }: { id: string; name: string }) {
     onSuccess: () => {
       toast.success("Cliente eliminato");
       qc.invalidateQueries({ queryKey: ["clients"] });
-      setOpen(false);
     },
     onError: (e: Error) => toast.error(e.message),
   });
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="text-destructive hover:text-destructive"
-        title="Elimina"
-        onClick={() => setOpen(true)}
-      >
-        <Trash2 className="h-4 w-4" />
-      </Button>
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-destructive hover:text-destructive"
+          title="Elimina"
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Elimina {name}?</AlertDialogTitle>
