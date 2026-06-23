@@ -283,7 +283,8 @@ function UploadPage() {
               {files.map((f) => {
                 const isExcel = /\.(xlsx|xls|csv)$/i.test(f.file_name);
                 return (
-                  <tr key={f.id} className="border-b border-border/60">
+                  <React.Fragment key={f.id}>
+                  <tr className="border-b border-border/60">
                     <td className="py-2 px-3">
                       <input
                         type="radio"
@@ -318,6 +319,16 @@ function UploadPage() {
                       </Button>
                     </td>
                   </tr>
+                  {f.status === "error" && f.errore && (
+                    <tr key={f.id + "-err"}>
+                      <td colSpan={8} className="px-3 pb-2">
+                        <p className="text-xs text-destructive bg-destructive/10 rounded px-2 py-1">
+                          {f.errore}
+                        </p>
+                      </td>
+                    </tr>
+                  )}
+                  </React.Fragment>
                 );
               })}
             </tbody>
