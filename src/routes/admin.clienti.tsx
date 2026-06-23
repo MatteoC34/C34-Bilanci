@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { PageCard } from "@/components/page-card";
 
@@ -51,7 +52,6 @@ function ClientiPage() {
 
   const all = clientsQ.data ?? [];
   const filtered = all.filter((c) => c.name.toLowerCase().includes(q.toLowerCase()) || (c.piva ?? "").includes(q));
-  const active = filtered.filter((c) => !c.invited_at || all.length < 2);
   const stats = {
     clienti: all.length,
     fatturato: "€ —",
@@ -105,7 +105,7 @@ function ClientiPage() {
           <p className="text-sm text-muted-foreground py-8 text-center">Caricamento…</p>
         ) : filtered.length === 0 ? (
           <p className="text-sm text-muted-foreground py-8 text-center">
-            Nessun cliente. Clicca "Invita Nuovo Cliente" o "Carica dati demo" per iniziare.
+            Nessun cliente. Clicca "Nuovo cliente" o "Carica dati demo" per iniziare.
           </p>
         ) : (
           <div className="overflow-x-auto">
@@ -120,7 +120,7 @@ function ClientiPage() {
                 </tr>
               </thead>
               <tbody>
-                {active.map((c) => (
+                {filtered.map((c) => (
                   <tr key={c.id} className="border-b border-border/60 hover:bg-muted/30">
                     <td className="py-3 px-3">
                       <div className="font-medium">{c.name}</div>
@@ -133,9 +133,15 @@ function ClientiPage() {
                       </span>
                     </td>
                     <td className="py-3 px-3">
-                      <span className="inline-flex items-center gap-1 text-[11px] text-success">
-                        <span className="h-1.5 w-1.5 rounded-full bg-success" /> Attivo
-                      </span>
+                      {c.invited_at ? (
+                        <span className="inline-flex items-center gap-1 text-[11px] text-warning">
+                          <span className="h-1.5 w-1.5 rounded-full bg-warning" /> Invitato
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
+                          <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground" /> Solo anagrafica
+                        </span>
+                      )}
                     </td>
                     <td className="py-3 px-3">
                       <div className="flex items-center justify-end gap-1">
