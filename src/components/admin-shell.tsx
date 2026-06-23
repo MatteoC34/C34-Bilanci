@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Users, Upload, Mail, BarChart3, AlertTriangle, Sparkles, FileText, Settings, LogOut } from "lucide-react";
+import { Users, Mail, BarChart3, AlertTriangle, Sparkles, FileText, Settings, LogOut } from "lucide-react";
 import { AppShell, type NavSection } from "./app-shell";
 import { signOut } from "@/hooks/use-me";
 import { Button } from "./ui/button";
@@ -9,7 +9,6 @@ const sections: NavSection[] = [
     label: "Gestione",
     items: [
       { label: "Clienti", to: "/admin/clienti", icon: Users },
-      { label: "Upload Bilanci", to: "/admin/upload", icon: Upload },
       { label: "Inviti Pendenti", to: "/admin/inviti", icon: Mail },
     ],
   },
