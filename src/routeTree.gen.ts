@@ -31,7 +31,7 @@ import { Route as AdminImpostazioniRouteImport } from './routes/admin.impostazio
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminClientiRouteImport } from './routes/admin.clienti'
 import { Route as AdminAlertRouteImport } from './routes/admin.alert'
-import { Route as AdminClientiIdRouteImport } from './routes/admin.clienti.$id'
+import { Route as AdminClientiIdIndexRouteImport } from './routes/admin.clienti.$id.index'
 import { Route as AdminClientiIdUploadRouteImport } from './routes/admin.clienti.$id.upload'
 import { Route as AdminClientiIdNoteRouteImport } from './routes/admin.clienti.$id.note'
 
@@ -146,20 +146,20 @@ const AdminAlertRoute = AdminAlertRouteImport.update({
   path: '/alert',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminClientiIdRoute = AdminClientiIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
+const AdminClientiIdIndexRoute = AdminClientiIdIndexRouteImport.update({
+  id: '/$id/',
+  path: '/$id/',
   getParentRoute: () => AdminClientiRoute,
 } as any)
 const AdminClientiIdUploadRoute = AdminClientiIdUploadRouteImport.update({
-  id: '/upload',
-  path: '/upload',
-  getParentRoute: () => AdminClientiIdRoute,
+  id: '/$id/upload',
+  path: '/$id/upload',
+  getParentRoute: () => AdminClientiRoute,
 } as any)
 const AdminClientiIdNoteRoute = AdminClientiIdNoteRouteImport.update({
-  id: '/note',
-  path: '/note',
-  getParentRoute: () => AdminClientiIdRoute,
+  id: '/$id/note',
+  path: '/$id/note',
+  getParentRoute: () => AdminClientiRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -185,9 +185,9 @@ export interface FileRoutesByFullPath {
   '/dashboard/stato-patrimoniale': typeof DashboardStatoPatrimonialeRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
-  '/admin/clienti/$id': typeof AdminClientiIdRouteWithChildren
   '/admin/clienti/$id/note': typeof AdminClientiIdNoteRoute
   '/admin/clienti/$id/upload': typeof AdminClientiIdUploadRoute
+  '/admin/clienti/$id/': typeof AdminClientiIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -210,9 +210,9 @@ export interface FileRoutesByTo {
   '/dashboard/stato-patrimoniale': typeof DashboardStatoPatrimonialeRoute
   '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
-  '/admin/clienti/$id': typeof AdminClientiIdRouteWithChildren
   '/admin/clienti/$id/note': typeof AdminClientiIdNoteRoute
   '/admin/clienti/$id/upload': typeof AdminClientiIdUploadRoute
+  '/admin/clienti/$id': typeof AdminClientiIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -238,9 +238,9 @@ export interface FileRoutesById {
   '/dashboard/stato-patrimoniale': typeof DashboardStatoPatrimonialeRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
-  '/admin/clienti/$id': typeof AdminClientiIdRouteWithChildren
   '/admin/clienti/$id/note': typeof AdminClientiIdNoteRoute
   '/admin/clienti/$id/upload': typeof AdminClientiIdUploadRoute
+  '/admin/clienti/$id/': typeof AdminClientiIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -267,9 +267,9 @@ export interface FileRouteTypes {
     | '/dashboard/stato-patrimoniale'
     | '/admin/'
     | '/dashboard/'
-    | '/admin/clienti/$id'
     | '/admin/clienti/$id/note'
     | '/admin/clienti/$id/upload'
+    | '/admin/clienti/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -292,9 +292,9 @@ export interface FileRouteTypes {
     | '/dashboard/stato-patrimoniale'
     | '/admin'
     | '/dashboard'
-    | '/admin/clienti/$id'
     | '/admin/clienti/$id/note'
     | '/admin/clienti/$id/upload'
+    | '/admin/clienti/$id'
   id:
     | '__root__'
     | '/'
@@ -319,9 +319,9 @@ export interface FileRouteTypes {
     | '/dashboard/stato-patrimoniale'
     | '/admin/'
     | '/dashboard/'
-    | '/admin/clienti/$id'
     | '/admin/clienti/$id/note'
     | '/admin/clienti/$id/upload'
+    | '/admin/clienti/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -487,50 +487,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAlertRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/clienti/$id': {
-      id: '/admin/clienti/$id'
+    '/admin/clienti/$id/': {
+      id: '/admin/clienti/$id/'
       path: '/$id'
-      fullPath: '/admin/clienti/$id'
-      preLoaderRoute: typeof AdminClientiIdRouteImport
+      fullPath: '/admin/clienti/$id/'
+      preLoaderRoute: typeof AdminClientiIdIndexRouteImport
       parentRoute: typeof AdminClientiRoute
     }
     '/admin/clienti/$id/upload': {
       id: '/admin/clienti/$id/upload'
-      path: '/upload'
+      path: '/$id/upload'
       fullPath: '/admin/clienti/$id/upload'
       preLoaderRoute: typeof AdminClientiIdUploadRouteImport
-      parentRoute: typeof AdminClientiIdRoute
+      parentRoute: typeof AdminClientiRoute
     }
     '/admin/clienti/$id/note': {
       id: '/admin/clienti/$id/note'
-      path: '/note'
+      path: '/$id/note'
       fullPath: '/admin/clienti/$id/note'
       preLoaderRoute: typeof AdminClientiIdNoteRouteImport
-      parentRoute: typeof AdminClientiIdRoute
+      parentRoute: typeof AdminClientiRoute
     }
   }
 }
 
-interface AdminClientiIdRouteChildren {
+interface AdminClientiRouteChildren {
   AdminClientiIdNoteRoute: typeof AdminClientiIdNoteRoute
   AdminClientiIdUploadRoute: typeof AdminClientiIdUploadRoute
-}
-
-const AdminClientiIdRouteChildren: AdminClientiIdRouteChildren = {
-  AdminClientiIdNoteRoute: AdminClientiIdNoteRoute,
-  AdminClientiIdUploadRoute: AdminClientiIdUploadRoute,
-}
-
-const AdminClientiIdRouteWithChildren = AdminClientiIdRoute._addFileChildren(
-  AdminClientiIdRouteChildren,
-)
-
-interface AdminClientiRouteChildren {
-  AdminClientiIdRoute: typeof AdminClientiIdRouteWithChildren
+  AdminClientiIdIndexRoute: typeof AdminClientiIdIndexRoute
 }
 
 const AdminClientiRouteChildren: AdminClientiRouteChildren = {
-  AdminClientiIdRoute: AdminClientiIdRouteWithChildren,
+  AdminClientiIdNoteRoute: AdminClientiIdNoteRoute,
+  AdminClientiIdUploadRoute: AdminClientiIdUploadRoute,
+  AdminClientiIdIndexRoute: AdminClientiIdIndexRoute,
 }
 
 const AdminClientiRouteWithChildren = AdminClientiRoute._addFileChildren(

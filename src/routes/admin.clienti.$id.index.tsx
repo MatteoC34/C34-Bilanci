@@ -15,7 +15,7 @@ import { KPI_LIBRARY, defaultKpisForTipo } from "@/lib/kpi-library";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/admin/clienti/$id")({
+export const Route = createFileRoute("/admin/clienti/$id/")({
   head: () => ({ meta: [{ title: "Dettaglio cliente — Consulting/34" }] }),
   component: ClienteDetail,
 });
