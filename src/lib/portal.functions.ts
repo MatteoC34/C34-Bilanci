@@ -83,6 +83,85 @@ export const createClient = createServerFn({ method: "POST" })
     return row;
   });
 
+// ============= Visura camerale: estrazione AI =============
+export const parseVisura = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({
+      file_base64: z.string().min(10),
+      mime_type: z.string().min(3),
+    }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const apiKey = process.env.LOVABLE_API_KEY;
+    if (!apiKey) throw new Error("LOVABLE_API_KEY mancante sul server");
+
+    const prompt = `Sei un assistente che estrae dati strutturati da una visura camerale italiana (Camera di Commercio). Estrai i seguenti campi e restituisci SOLO un oggetto JSON valido, senza testo aggiuntivo. Se un campo non è presente, usa stringa vuota "".
+Campi:
+- name: ragione sociale / denominazione
+- piva: partita IVA (solo cifre)
+- codice_fiscale: codice fiscale
+- ateco: codice attività ATECO principale (es. "62.01.00")
+- email: indirizzo PEC se presente, altrimenti email ordinaria
+- indirizzo_sede: indirizzo completo sede legale
+- forma_giuridica: es. "S.R.L.", "S.P.A.", "S.A.S."
+- tipo_suggerito: uno tra "pmi", "startup_pre", "startup_scale", "holding", "immobiliare" (scegli il più probabile in base ad ATECO/oggetto sociale)
+
+Formato risposta: {"name":"","piva":"","codice_fiscale":"","ateco":"","email":"","indirizzo_sede":"","forma_giuridica":"","tipo_suggerito":"pmi"}`;
+
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages: [
+          { role: "system", content: "Rispondi sempre e solo con JSON valido, senza commenti." },
+          {
+            role: "user",
+            content: [
+              { type: "text", text: prompt },
+              {
+                type: "image_url",
+                image_url: { url: `data:${data.mime_type};base64,${data.file_base64}` },
+              },
+            ],
+          },
+        ],
+        response_format: { type: "json_object" },
+      }),
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Errore AI (${res.status}): ${text.slice(0, 400)}`);
+    }
+    const json = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
+    const content = json.choices?.[0]?.message?.content ?? "{}";
+    let parsed: Record<string, string> = {};
+    try {
+      parsed = JSON.parse(content);
+    } catch {
+      // Try to extract JSON block from the text
+      const m = content.match(/\{[\s\S]*\}/);
+      parsed = m ? JSON.parse(m[0]) : {};
+    }
+    const allowedTipi = ["pmi", "startup_pre", "startup_scale", "holding", "immobiliare"];
+    const tipo = allowedTipi.includes(parsed.tipo_suggerito) ? parsed.tipo_suggerito : "pmi";
+    return {
+      name: parsed.name ?? "",
+      piva: (parsed.piva ?? "").replace(/\D/g, ""),
+      codice_fiscale: parsed.codice_fiscale ?? "",
+      ateco: parsed.ateco ?? "",
+      email: parsed.email ?? "",
+      indirizzo_sede: parsed.indirizzo_sede ?? "",
+      forma_giuridica: parsed.forma_giuridica ?? "",
+      tipo,
+    };
+  });
+
 export const updateClientTipo = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
