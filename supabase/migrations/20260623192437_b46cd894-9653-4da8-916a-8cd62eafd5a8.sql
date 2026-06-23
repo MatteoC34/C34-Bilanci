@@ -1,0 +1,1 @@
+ALTER TABLE public.clients ADD COLUMN IF NOT EXISTS sibill_api_key text, ADD COLUMN IF NOT EXISTS drive_url text;
