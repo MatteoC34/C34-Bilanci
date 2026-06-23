@@ -329,6 +329,22 @@ export const avviaRevisione = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+export const deleteUploadedFile = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ file_id: z.string().uuid(), storage_path: z.string() }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("uploaded_files")
+      .delete()
+      .eq("id", data.file_id);
+    if (error) throw error;
+    return { ok: true };
+  });
+
 // ============= Advisor notes =============
 export const listNotes = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])

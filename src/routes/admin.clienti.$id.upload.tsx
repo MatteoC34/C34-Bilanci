@@ -2,10 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { ArrowLeft, Cloud, FileSpreadsheet, FileText, Loader2, Play, Upload as UploadIcon, AlertCircle, ExternalLink, KeyRound } from "lucide-react";
+import { ArrowLeft, Cloud, FileSpreadsheet, FileText, Loader2, Play, Upload as UploadIcon, AlertCircle, ExternalLink, KeyRound, Trash2 } from "lucide-react";
 import { AdminShell } from "@/components/admin-shell";
 import { useRequireAuth } from "@/hooks/use-me";
-import { listUploadedFiles, recordUploadedFile, getClient } from "@/lib/portal.functions";
+import { listUploadedFiles, recordUploadedFile, getClient, deleteUploadedFile } from "@/lib/portal.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -40,6 +40,7 @@ function UploadPage() {
   const listFiles = useServerFn(listUploadedFiles);
   const recordFile = useServerFn(recordUploadedFile);
   const getC = useServerFn(getClient);
+  const deleteFile = useServerFn(deleteUploadedFile);
 
   const clientQ = useQuery({ queryKey: ["client", id, "name"], queryFn: () => getC({ data: { id } }) });
   const client = clientQ.data?.client as
@@ -101,6 +102,22 @@ function UploadPage() {
     onError: (err: unknown) => {
       const msg = err instanceof Error ? err.message : "Errore durante l'elaborazione";
       setErrorMsg(msg);
+      toast.error(msg);
+    },
+  });
+
+  const deleteFileM = useMutation({
+    mutationFn: async (f: { id: string; storage_path: string }) => {
+      const { error } = await supabase.storage.from("bilanci").remove([f.storage_path]);
+      if (error) throw error;
+      await deleteFile({ data: { file_id: f.id, storage_path: f.storage_path } });
+    },
+    onSuccess: () => {
+      toast.success("File eliminato");
+      qc.invalidateQueries({ queryKey: ["files", id] });
+    },
+    onError: (err: unknown) => {
+      const msg = err instanceof Error ? err.message : "Errore durante l'eliminazione";
       toast.error(msg);
     },
   });
@@ -222,8 +239,14 @@ function UploadPage() {
                 type="file"
                 className="hidden"
                 accept=".xlsx,.xls,.csv,.pdf"
+                multiple
                 disabled={uploading}
-                onChange={(e) => e.target.files?.[0] && handleUpload(e.target.files[0])}
+                onChange={async (e) => {
+                  const files = Array.from(e.target.files ?? []);
+                  for (const file of files) {
+                    await handleUpload(file);
+                  }
+                }}
               />
             </label>
           </div>
@@ -253,6 +276,7 @@ function UploadPage() {
                 <th className="py-2 px-3">Periodo</th>
                 <th className="py-2 px-3">Caricato</th>
                 <th className="py-2 px-3">Stato</th>
+                <th className="py-2 px-3">Azioni</th>
               </tr>
             </thead>
             <tbody>
@@ -280,6 +304,18 @@ function UploadPage() {
                       <span className={cn("inline-flex px-2 py-0.5 rounded text-[10px] font-semibold", statusStyle[f.status])}>
                         {statusLabel[f.status]}
                       </span>
+                    </td>
+                    <td className="py-2 px-3">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-destructive hover:text-destructive"
+                        title="Elimina"
+                        disabled={deleteFileM.isPending || !f.storage_path}
+                        onClick={() => f.storage_path && deleteFileM.mutate({ id: f.id, storage_path: f.storage_path })}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </td>
                   </tr>
                 );
