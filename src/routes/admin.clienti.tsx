@@ -2,10 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Plus, Search, ExternalLink, Upload as UploadIcon, MessageSquare, Sparkles, FileText, Loader2 } from "lucide-react";
+import { Plus, Search, ExternalLink, Upload as UploadIcon, MessageSquare, Sparkles, FileText, Loader2, Trash2, Pencil, Eye, EyeOff } from "lucide-react";
 import { AdminShell } from "@/components/admin-shell";
 import { useRequireAuth } from "@/hooks/use-me";
-import { listClients, createClient, seedDemoData, parseVisura } from "@/lib/portal.functions";
+import { listClients, createClient, seedDemoData, parseVisura, updateClient, deleteClient } from "@/lib/portal.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +13,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { PageCard } from "@/components/page-card";
 
@@ -145,6 +155,8 @@ function ClientiPage() {
                     </td>
                     <td className="py-3 px-3">
                       <div className="flex items-center justify-end gap-1">
+                        <EditClientDialog client={c} />
+                        <DeleteClientDialog id={c.id} name={c.name} />
                         <Link to="/admin/clienti/$id" params={{ id: c.id }} title="KPI">
                           <Button variant="ghost" size="icon"><ExternalLink className="h-4 w-4" /></Button>
                         </Link>
