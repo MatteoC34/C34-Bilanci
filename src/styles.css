@@ -73,7 +73,7 @@
   --radius: 0.625rem;
   --background: oklch(0.972 0.003 250);          /* #f4f5f8 */
   --foreground: oklch(0.22 0.02 260);
-  --card: oklch(1 0 0);                           /* #ffffff */
+  --card: oklch(0.998 0 0);                        /* near-white, slight contrast vs bg */
   --card-foreground: oklch(0.22 0.02 260);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.22 0.02 260);
