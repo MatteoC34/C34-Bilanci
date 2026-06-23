@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -46,6 +46,7 @@ function ClientiPage() {
   const seed = useServerFn(seedDemoData);
   const qc = useQueryClient();
   const [q, setQ] = useState("");
+  const navigate = useNavigate();
 
   const clientsQ = useQuery({
     queryKey: ["clients"],
@@ -158,18 +159,40 @@ function ClientiPage() {
                       <div className="flex items-center justify-end gap-1">
                         <EditClientDialog client={c} />
                         <DeleteClientDialog id={c.id} name={c.name} />
-                        <Link to="/admin/clienti/$id" params={{ id: c.id }} title="KPI">
-                          <Button variant="ghost" size="icon"><ExternalLink className="h-4 w-4" /></Button>
-                        </Link>
-                        <Link to="/admin/clienti/$id/upload" params={{ id: c.id }}>
-                          <Button variant="outline" size="sm" className="gap-1.5">
-                            <UploadIcon className="h-3.5 w-3.5" />
-                            Upload
-                          </Button>
-                        </Link>
-                        <Link to="/admin/clienti/$id/note" params={{ id: c.id }} title="Note">
-                          <Button variant="ghost" size="icon"><MessageSquare className="h-4 w-4" /></Button>
-                        </Link>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="KPI"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate({ to: "/admin/clienti/$id", params: { id: c.id } });
+                          }}
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-1.5"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate({ to: "/admin/clienti/$id/upload", params: { id: c.id } });
+                          }}
+                        >
+                          <UploadIcon className="h-3.5 w-3.5" />
+                          Upload
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="Note"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate({ to: "/admin/clienti/$id/note", params: { id: c.id } });
+                          }}
+                        >
+                          <MessageSquare className="h-4 w-4" />
+                        </Button>
                       </div>
                     </td>
                   </tr>
