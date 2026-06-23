@@ -258,6 +258,7 @@ function ImportVisuraDialog() {
     forma_giuridica: "",
   });
   const [extracted, setExtracted] = useState(false);
+  const [sendInvite, setSendInvite] = useState(false);
   const parse = useServerFn(parseVisura);
   const create = useServerFn(createClient);
   const qc = useQueryClient();
@@ -301,13 +302,14 @@ function ImportVisuraDialog() {
         data: {
           name: form.name,
           piva: form.piva || null,
-          email: form.email,
+          email: form.email || null,
           ateco: form.ateco || null,
           tipo: form.tipo as never,
+          send_invite: sendInvite,
         },
       }),
     onSuccess: () => {
-      toast.success("Cliente creato e invito inviato");
+      toast.success(sendInvite ? "Cliente creato e invito inviato" : "Cliente creato");
       qc.invalidateQueries({ queryKey: ["clients"] });
       reset();
       setOpen(false);
@@ -319,6 +321,7 @@ function ImportVisuraDialog() {
     setForm({ name: "", piva: "", email: "", ateco: "", tipo: "pmi", codice_fiscale: "", indirizzo_sede: "", forma_giuridica: "" });
     setExtracted(false);
     setErrorMsg(null);
+    setSendInvite(false);
   }
 
   return (
@@ -413,7 +416,7 @@ function ImportVisuraDialog() {
                 <Input value={form.indirizzo_sede} onChange={(e) => setForm({ ...form, indirizzo_sede: e.target.value })} />
               </div>
               <div className="col-span-2">
-                <Label>Email (per invito)</Label>
+                <Label>Email <span className="text-muted-foreground font-normal">(opzionale, per invito)</span></Label>
                 <Input
                   type="email"
                   value={form.email}
@@ -434,6 +437,14 @@ function ImportVisuraDialog() {
                   </SelectContent>
                 </Select>
               </div>
+              <label className="col-span-2 flex items-center gap-2 pt-1 cursor-pointer">
+                <Checkbox
+                  checked={sendInvite}
+                  onCheckedChange={(v) => setSendInvite(v === true)}
+                  disabled={!form.email}
+                />
+                <span className="text-sm">Invia invito al cliente via email</span>
+              </label>
             </div>
           </div>
         )}
@@ -446,9 +457,9 @@ function ImportVisuraDialog() {
           {extracted && (
             <Button
               onClick={() => createM.mutate()}
-              disabled={createM.isPending || !form.name || !form.email}
+              disabled={createM.isPending || !form.name}
             >
-              {createM.isPending ? "Creazione…" : "Crea cliente"}
+              {createM.isPending ? "Creazione…" : sendInvite ? "Crea e invia invito" : "Crea cliente"}
             </Button>
           )}
         </DialogFooter>
