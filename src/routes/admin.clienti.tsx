@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { PageCard } from "@/components/page-card";
 
@@ -51,7 +52,6 @@ function ClientiPage() {
 
   const all = clientsQ.data ?? [];
   const filtered = all.filter((c) => c.name.toLowerCase().includes(q.toLowerCase()) || (c.piva ?? "").includes(q));
-  const active = filtered.filter((c) => !c.invited_at || all.length < 2);
   const stats = {
     clienti: all.length,
     fatturato: "€ —",
@@ -105,7 +105,7 @@ function ClientiPage() {
           <p className="text-sm text-muted-foreground py-8 text-center">Caricamento…</p>
         ) : filtered.length === 0 ? (
           <p className="text-sm text-muted-foreground py-8 text-center">
-            Nessun cliente. Clicca "Invita Nuovo Cliente" o "Carica dati demo" per iniziare.
+            Nessun cliente. Clicca "Nuovo cliente" o "Carica dati demo" per iniziare.
           </p>
         ) : (
           <div className="overflow-x-auto">
@@ -120,7 +120,7 @@ function ClientiPage() {
                 </tr>
               </thead>
               <tbody>
-                {active.map((c) => (
+                {filtered.map((c) => (
                   <tr key={c.id} className="border-b border-border/60 hover:bg-muted/30">
                     <td className="py-3 px-3">
                       <div className="font-medium">{c.name}</div>
@@ -133,9 +133,15 @@ function ClientiPage() {
                       </span>
                     </td>
                     <td className="py-3 px-3">
-                      <span className="inline-flex items-center gap-1 text-[11px] text-success">
-                        <span className="h-1.5 w-1.5 rounded-full bg-success" /> Attivo
-                      </span>
+                      {c.invited_at ? (
+                        <span className="inline-flex items-center gap-1 text-[11px] text-warning">
+                          <span className="h-1.5 w-1.5 rounded-full bg-warning" /> Invitato
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
+                          <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground" /> Solo anagrafica
+                        </span>
+                      )}
                     </td>
                     <td className="py-3 px-3">
                       <div className="flex items-center justify-end gap-1">
@@ -166,14 +172,26 @@ function InviteDialog() {
   const create = useServerFn(createClient);
   const qc = useQueryClient();
   const [form, setForm] = useState({ name: "", piva: "", email: "", tipo: "pmi", ateco: "" });
+  const [sendInvite, setSendInvite] = useState(false);
 
   const m = useMutation({
-    mutationFn: () => create({ data: { ...form, tipo: form.tipo as never } }),
+    mutationFn: () =>
+      create({
+        data: {
+          name: form.name,
+          piva: form.piva || null,
+          email: form.email || null,
+          ateco: form.ateco || null,
+          tipo: form.tipo as never,
+          send_invite: sendInvite,
+        },
+      }),
     onSuccess: () => {
-      toast.success("Cliente creato e invito inviato");
+      toast.success(sendInvite ? "Cliente creato e invito inviato" : "Cliente creato");
       qc.invalidateQueries({ queryKey: ["clients"] });
       setOpen(false);
       setForm({ name: "", piva: "", email: "", tipo: "pmi", ateco: "" });
+      setSendInvite(false);
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -181,14 +199,17 @@ function InviteDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm"><Plus className="h-4 w-4 mr-1" /> Invita Nuovo Cliente</Button>
+        <Button size="sm"><Plus className="h-4 w-4 mr-1" /> Nuovo cliente</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader><DialogTitle>Nuovo cliente</DialogTitle></DialogHeader>
         <div className="space-y-3">
           <div><Label>Nome cliente</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
           <div><Label>P.IVA</Label><Input value={form.piva} onChange={(e) => setForm({ ...form, piva: e.target.value })} /></div>
-          <div><Label>Email</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
+          <div>
+            <Label>Email <span className="text-muted-foreground font-normal">(opzionale)</span></Label>
+            <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+          </div>
           <div><Label>ATECO</Label><Input value={form.ateco} onChange={(e) => setForm({ ...form, ateco: e.target.value })} /></div>
           <div>
             <Label>Tipologia</Label>
@@ -203,11 +224,19 @@ function InviteDialog() {
               </SelectContent>
             </Select>
           </div>
+          <label className="flex items-center gap-2 pt-1 cursor-pointer">
+            <Checkbox
+              checked={sendInvite}
+              onCheckedChange={(v) => setSendInvite(v === true)}
+              disabled={!form.email}
+            />
+            <span className="text-sm">Invia invito al cliente via email</span>
+          </label>
         </div>
         <DialogFooter>
           <Button variant="ghost" onClick={() => setOpen(false)}>Annulla</Button>
-          <Button onClick={() => m.mutate()} disabled={m.isPending || !form.name || !form.email}>
-            {m.isPending ? "Invio…" : "Crea e invia invito"}
+          <Button onClick={() => m.mutate()} disabled={m.isPending || !form.name}>
+            {m.isPending ? "Salvo…" : sendInvite ? "Crea e invia invito" : "Crea cliente"}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -229,6 +258,7 @@ function ImportVisuraDialog() {
     forma_giuridica: "",
   });
   const [extracted, setExtracted] = useState(false);
+  const [sendInvite, setSendInvite] = useState(false);
   const parse = useServerFn(parseVisura);
   const create = useServerFn(createClient);
   const qc = useQueryClient();
@@ -272,13 +302,14 @@ function ImportVisuraDialog() {
         data: {
           name: form.name,
           piva: form.piva || null,
-          email: form.email,
+          email: form.email || null,
           ateco: form.ateco || null,
           tipo: form.tipo as never,
+          send_invite: sendInvite,
         },
       }),
     onSuccess: () => {
-      toast.success("Cliente creato e invito inviato");
+      toast.success(sendInvite ? "Cliente creato e invito inviato" : "Cliente creato");
       qc.invalidateQueries({ queryKey: ["clients"] });
       reset();
       setOpen(false);
@@ -290,6 +321,7 @@ function ImportVisuraDialog() {
     setForm({ name: "", piva: "", email: "", ateco: "", tipo: "pmi", codice_fiscale: "", indirizzo_sede: "", forma_giuridica: "" });
     setExtracted(false);
     setErrorMsg(null);
+    setSendInvite(false);
   }
 
   return (
@@ -384,7 +416,7 @@ function ImportVisuraDialog() {
                 <Input value={form.indirizzo_sede} onChange={(e) => setForm({ ...form, indirizzo_sede: e.target.value })} />
               </div>
               <div className="col-span-2">
-                <Label>Email (per invito)</Label>
+                <Label>Email <span className="text-muted-foreground font-normal">(opzionale, per invito)</span></Label>
                 <Input
                   type="email"
                   value={form.email}
@@ -405,6 +437,14 @@ function ImportVisuraDialog() {
                   </SelectContent>
                 </Select>
               </div>
+              <label className="col-span-2 flex items-center gap-2 pt-1 cursor-pointer">
+                <Checkbox
+                  checked={sendInvite}
+                  onCheckedChange={(v) => setSendInvite(v === true)}
+                  disabled={!form.email}
+                />
+                <span className="text-sm">Invia invito al cliente via email</span>
+              </label>
             </div>
           </div>
         )}
@@ -417,9 +457,9 @@ function ImportVisuraDialog() {
           {extracted && (
             <Button
               onClick={() => createM.mutate()}
-              disabled={createM.isPending || !form.name || !form.email}
+              disabled={createM.isPending || !form.name}
             >
-              {createM.isPending ? "Creazione…" : "Crea cliente"}
+              {createM.isPending ? "Creazione…" : sendInvite ? "Crea e invia invito" : "Crea cliente"}
             </Button>
           )}
         </DialogFooter>
