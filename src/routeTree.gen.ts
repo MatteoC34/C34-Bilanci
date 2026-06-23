@@ -31,6 +31,7 @@ import { Route as AdminImpostazioniRouteImport } from './routes/admin.impostazio
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminClientiRouteImport } from './routes/admin.clienti'
 import { Route as AdminAlertRouteImport } from './routes/admin.alert'
+import { Route as AdminClientiIndexRouteImport } from './routes/admin.clienti.index'
 import { Route as AdminClientiIdRouteImport } from './routes/admin.clienti.$id'
 import { Route as AdminClientiIdIndexRouteImport } from './routes/admin.clienti.$id.index'
 import { Route as AdminClientiIdUploadRouteImport } from './routes/admin.clienti.$id.upload'
@@ -147,6 +148,11 @@ const AdminAlertRoute = AdminAlertRouteImport.update({
   path: '/alert',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminClientiIndexRoute = AdminClientiIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminClientiRoute,
+} as any)
 const AdminClientiIdRoute = AdminClientiIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -192,6 +198,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/admin/clienti/$id': typeof AdminClientiIdRouteWithChildren
+  '/admin/clienti/': typeof AdminClientiIndexRoute
   '/admin/clienti/$id/note': typeof AdminClientiIdNoteRoute
   '/admin/clienti/$id/upload': typeof AdminClientiIdUploadRoute
   '/admin/clienti/$id/': typeof AdminClientiIdIndexRoute
@@ -200,7 +207,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/admin/alert': typeof AdminAlertRoute
-  '/admin/clienti': typeof AdminClientiRouteWithChildren
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/impostazioni': typeof AdminImpostazioniRoute
   '/admin/inviti': typeof AdminInvitiRoute
@@ -217,6 +223,7 @@ export interface FileRoutesByTo {
   '/dashboard/stato-patrimoniale': typeof DashboardStatoPatrimonialeRoute
   '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/admin/clienti': typeof AdminClientiIndexRoute
   '/admin/clienti/$id/note': typeof AdminClientiIdNoteRoute
   '/admin/clienti/$id/upload': typeof AdminClientiIdUploadRoute
   '/admin/clienti/$id': typeof AdminClientiIdIndexRoute
@@ -246,6 +253,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/admin/clienti/$id': typeof AdminClientiIdRouteWithChildren
+  '/admin/clienti/': typeof AdminClientiIndexRoute
   '/admin/clienti/$id/note': typeof AdminClientiIdNoteRoute
   '/admin/clienti/$id/upload': typeof AdminClientiIdUploadRoute
   '/admin/clienti/$id/': typeof AdminClientiIdIndexRoute
@@ -276,6 +284,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/dashboard/'
     | '/admin/clienti/$id'
+    | '/admin/clienti/'
     | '/admin/clienti/$id/note'
     | '/admin/clienti/$id/upload'
     | '/admin/clienti/$id/'
@@ -284,7 +293,6 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/admin/alert'
-    | '/admin/clienti'
     | '/admin/dashboard'
     | '/admin/impostazioni'
     | '/admin/inviti'
@@ -301,6 +309,7 @@ export interface FileRouteTypes {
     | '/dashboard/stato-patrimoniale'
     | '/admin'
     | '/dashboard'
+    | '/admin/clienti'
     | '/admin/clienti/$id/note'
     | '/admin/clienti/$id/upload'
     | '/admin/clienti/$id'
@@ -329,6 +338,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/dashboard/'
     | '/admin/clienti/$id'
+    | '/admin/clienti/'
     | '/admin/clienti/$id/note'
     | '/admin/clienti/$id/upload'
     | '/admin/clienti/$id/'
@@ -497,6 +507,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAlertRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/clienti/': {
+      id: '/admin/clienti/'
+      path: '/'
+      fullPath: '/admin/clienti/'
+      preLoaderRoute: typeof AdminClientiIndexRouteImport
+      parentRoute: typeof AdminClientiRoute
+    }
     '/admin/clienti/$id': {
       id: '/admin/clienti/$id'
       path: '/$id'
@@ -546,10 +563,12 @@ const AdminClientiIdRouteWithChildren = AdminClientiIdRoute._addFileChildren(
 
 interface AdminClientiRouteChildren {
   AdminClientiIdRoute: typeof AdminClientiIdRouteWithChildren
+  AdminClientiIndexRoute: typeof AdminClientiIndexRoute
 }
 
 const AdminClientiRouteChildren: AdminClientiRouteChildren = {
   AdminClientiIdRoute: AdminClientiIdRouteWithChildren,
+  AdminClientiIndexRoute: AdminClientiIndexRoute,
 }
 
 const AdminClientiRouteWithChildren = AdminClientiRoute._addFileChildren(
