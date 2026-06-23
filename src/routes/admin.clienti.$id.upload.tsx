@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { ArrowLeft, Cloud, FileSpreadsheet, FileText, Loader2, Play, Upload as UploadIcon, AlertCircle, ExternalLink, KeyRound, Trash2 } from "lucide-react";
 import { AdminShell } from "@/components/admin-shell";
 import { useRequireAuth } from "@/hooks/use-me";
@@ -283,7 +283,8 @@ function UploadPage() {
               {files.map((f) => {
                 const isExcel = /\.(xlsx|xls|csv)$/i.test(f.file_name);
                 return (
-                  <tr key={f.id} className="border-b border-border/60">
+                  <Fragment key={f.id}>
+                  <tr className="border-b border-border/60">
                     <td className="py-2 px-3">
                       <input
                         type="radio"
@@ -318,6 +319,16 @@ function UploadPage() {
                       </Button>
                     </td>
                   </tr>
+                  {f.status === "error" && f.errore && (
+                    <tr key={f.id + "-err"}>
+                      <td colSpan={8} className="px-3 pb-2">
+                        <p className="text-xs text-destructive bg-destructive/10 rounded px-2 py-1">
+                          {f.errore}
+                        </p>
+                      </td>
+                    </tr>
+                  )}
+                  </Fragment>
                 );
               })}
             </tbody>
