@@ -22,8 +22,8 @@ export function KpiCard({ label, value, subtitle, delta, accent = "gold", invert
   const hasDelta = delta !== null && delta !== undefined && !Number.isNaN(delta);
   const positive = hasDelta && (invertDelta ? (delta as number) < 0 : (delta as number) > 0);
   return (
-    <div className="relative overflow-hidden rounded-xl bg-card border border-border p-5 transition-shadow hover:shadow-md">
-      <div className={cn("absolute inset-x-0 top-0 h-1", stripClass[accent])} />
+    <div className="relative overflow-hidden rounded-xl bg-card border border-border p-4 shadow-sm transition-shadow hover:shadow-md">
+      <div className={cn("absolute inset-y-0 left-0 w-1 rounded-l-xl", stripClass[accent])} />
       <div className="flex items-start justify-between gap-2 mb-3">
         <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{label}</span>
         {hasDelta && (
@@ -38,7 +38,7 @@ export function KpiCard({ label, value, subtitle, delta, accent = "gold", invert
           </span>
         )}
       </div>
-      <div className="tabular text-2xl font-bold text-foreground">{value}</div>
+      <div className="tabular text-xl font-bold text-foreground">{value}</div>
       {subtitle && <div className="mt-1 text-xs text-muted-foreground">{subtitle}</div>}
     </div>
   );

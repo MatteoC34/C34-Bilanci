@@ -34,7 +34,8 @@ export const listClients = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await assertAdmin(context.supabase, context.userId);
-    const { data, error } = await context.supabase
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
       .from("clients")
       .select("*")
       .order("created_at", { ascending: false });
@@ -69,7 +70,8 @@ export const createClient = createServerFn({ method: "POST" })
     await assertAdmin(context.supabase, context.userId);
     const { send_invite, email, ...rest } = data;
     const shouldInvite = !!send_invite && !!email;
-    const { data: row, error } = await context.supabase
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row, error } = await supabaseAdmin
       .from("clients")
       .insert({ ...rest, email: email ?? null, invited_at: shouldInvite ? new Date().toISOString() : null })
       .select()
@@ -77,7 +79,6 @@ export const createClient = createServerFn({ method: "POST" })
     if (error) throw error;
     if (shouldInvite) {
       try {
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         await supabaseAdmin.auth.admin.inviteUserByEmail(email!);
       } catch (e) {
         console.error("invite email failed", e);
@@ -226,7 +227,9 @@ export const listUploadedFiles = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ client_id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
-    const { data: rows, error } = await context.supabase
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows, error } = await supabaseAdmin
       .from("uploaded_files")
       .select("*")
       .eq("client_id", data.client_id)
@@ -249,7 +252,8 @@ export const recordUploadedFile = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
-    const { data: row, error } = await context.supabase
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row, error } = await supabaseAdmin
       .from("uploaded_files")
       .insert({ ...data, status: "pending", source: "manuale" })
       .select()

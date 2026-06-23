@@ -69,7 +69,7 @@ export function AppShell({ brand, badge, sections, footer, headerTitle, headerSu
       </aside>
 
       <main className="flex-1 flex flex-col min-w-0">
-        <header className="h-14 border-b border-border bg-card/40 backdrop-blur flex items-center justify-between px-6">
+        <header className="border-b border-border bg-card/40 backdrop-blur flex items-center justify-between px-6 py-3">
           <div>
             <h1 className="text-base font-semibold">{headerTitle}</h1>
             {headerSubtitle && <p className="text-xs text-muted-foreground">{headerSubtitle}</p>}

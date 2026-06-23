@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { FileDown, Sparkles } from "lucide-react";
 import { ClientShell } from "@/components/client-shell";
 import { useMyClient } from "@/hooks/use-my-client";
@@ -133,14 +133,18 @@ function Overview() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
         <PageCard title="Ricavi vs anno precedente" subtitle="Trimestrale, in migliaia di €" className="lg:col-span-2">
-          <div className="h-64">
+          <div className="mb-2 flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground">
+            <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-sm bg-muted-foreground" />2023</span>
+            <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-sm bg-primary" />2024</span>
+            <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-sm bg-destructive" />Costi</span>
+          </div>
+          <div className="h-44">
             <ResponsiveContainer>
               <BarChart data={quarterly}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                 <XAxis dataKey="q" stroke="var(--muted-foreground)" fontSize={11} />
                 <YAxis stroke="var(--muted-foreground)" fontSize={11} />
                 <Tooltip contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8 }} />
-                <Legend wrapperStyle={{ fontSize: 11 }} />
                 <Bar dataKey="prev" name="2023" fill="var(--muted-foreground)" radius={[4,4,0,0]} />
                 <Bar dataKey="curr" name="2024" fill="var(--primary)" radius={[4,4,0,0]} />
                 <Bar dataKey="costi" name="Costi" fill="var(--destructive)" radius={[4,4,0,0]} />
@@ -150,14 +154,13 @@ function Overview() {
         </PageCard>
 
         <PageCard title="Composizione costi" subtitle="% sul totale">
-          <div className="h-64">
+          <div className="h-44">
             <ResponsiveContainer>
               <PieChart>
-                <Pie data={costMix} dataKey="value" nameKey="name" innerRadius={48} outerRadius={80} paddingAngle={2}>
+                <Pie data={costMix} dataKey="value" nameKey="name" innerRadius={36} outerRadius={60} paddingAngle={2}>
                   {costMix.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
                 <Tooltip contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8 }} />
-                <Legend wrapperStyle={{ fontSize: 11 }} />
               </PieChart>
             </ResponsiveContainer>
           </div>

@@ -71,14 +71,14 @@ function ClientiPage() {
     >
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {[
-          { l: "Clienti attivi", v: String(stats.clienti) },
-          { l: "Fatturato aggregato", v: stats.fatturato },
-          { l: "Alert critici", v: String(stats.alert) },
-          { l: "Bilanci YTD", v: String(stats.bilanci) },
+          { l: "Clienti attivi", v: String(stats.clienti), border: "border-l-2 border-primary" },
+          { l: "Fatturato aggregato", v: stats.fatturato, border: "border-l-2 border-success" },
+          { l: "Alert critici", v: String(stats.alert), border: "border-l-2 border-destructive" },
+          { l: "Bilanci YTD", v: String(stats.bilanci), border: "border-l-2 border-info" },
         ].map((s) => (
-          <div key={s.l} className="rounded-xl border border-border bg-card p-4">
+          <div key={s.l} className={`rounded-xl border border-border bg-card p-4 shadow-sm ${s.border}`}>
             <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{s.l}</div>
-            <div className="tabular text-2xl font-bold mt-2">{s.v}</div>
+            <div className="tabular text-xl font-bold mt-2">{s.v}</div>
           </div>
         ))}
       </div>
