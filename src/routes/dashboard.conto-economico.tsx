@@ -52,8 +52,8 @@ function CE() {
               {Object.entries(grouped).map(([sezione, items]) => {
                 const total = items.reduce((s, i) => s + Number(i.saldo ?? 0), 0);
                 return (
-                  <>
-                    <tr key={sezione} className="bg-muted/40">
+                  <React.Fragment key={sezione}>
+                    <tr className="bg-muted/40">
                       <td colSpan={3} className="py-2 px-3 font-semibold text-xs uppercase tracking-wider">{sezione}</td>
                     </tr>
                     {items.map((r) => (
@@ -71,7 +71,7 @@ function CE() {
                         {fmt(total)}
                       </td>
                     </tr>
-                  </>
+                  </React.Fragment>
                 );
               })}
             </tbody>
