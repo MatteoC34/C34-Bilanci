@@ -16,6 +16,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as DashboardStatoPatrimonialeRouteImport } from './routes/dashboard.stato-patrimoniale'
+import { Route as DashboardSimulatoreRouteImport } from './routes/dashboard.simulatore'
 import { Route as DashboardOverviewRouteImport } from './routes/dashboard.overview'
 import { Route as DashboardNoteRouteImport } from './routes/dashboard.note'
 import { Route as DashboardMastriniRouteImport } from './routes/dashboard.mastrini'
@@ -70,6 +71,11 @@ const DashboardStatoPatrimonialeRoute =
     path: '/stato-patrimoniale',
     getParentRoute: () => DashboardRoute,
   } as any)
+const DashboardSimulatoreRoute = DashboardSimulatoreRouteImport.update({
+  id: '/simulatore',
+  path: '/simulatore',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardOverviewRoute = DashboardOverviewRouteImport.update({
   id: '/overview',
   path: '/overview',
@@ -175,6 +181,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/mastrini': typeof DashboardMastriniRoute
   '/dashboard/note': typeof DashboardNoteRoute
   '/dashboard/overview': typeof DashboardOverviewRoute
+  '/dashboard/simulatore': typeof DashboardSimulatoreRoute
   '/dashboard/stato-patrimoniale': typeof DashboardStatoPatrimonialeRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -199,6 +206,7 @@ export interface FileRoutesByTo {
   '/dashboard/mastrini': typeof DashboardMastriniRoute
   '/dashboard/note': typeof DashboardNoteRoute
   '/dashboard/overview': typeof DashboardOverviewRoute
+  '/dashboard/simulatore': typeof DashboardSimulatoreRoute
   '/dashboard/stato-patrimoniale': typeof DashboardStatoPatrimonialeRoute
   '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
@@ -226,6 +234,7 @@ export interface FileRoutesById {
   '/dashboard/mastrini': typeof DashboardMastriniRoute
   '/dashboard/note': typeof DashboardNoteRoute
   '/dashboard/overview': typeof DashboardOverviewRoute
+  '/dashboard/simulatore': typeof DashboardSimulatoreRoute
   '/dashboard/stato-patrimoniale': typeof DashboardStatoPatrimonialeRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -254,6 +263,7 @@ export interface FileRouteTypes {
     | '/dashboard/mastrini'
     | '/dashboard/note'
     | '/dashboard/overview'
+    | '/dashboard/simulatore'
     | '/dashboard/stato-patrimoniale'
     | '/admin/'
     | '/dashboard/'
@@ -278,6 +288,7 @@ export interface FileRouteTypes {
     | '/dashboard/mastrini'
     | '/dashboard/note'
     | '/dashboard/overview'
+    | '/dashboard/simulatore'
     | '/dashboard/stato-patrimoniale'
     | '/admin'
     | '/dashboard'
@@ -304,6 +315,7 @@ export interface FileRouteTypes {
     | '/dashboard/mastrini'
     | '/dashboard/note'
     | '/dashboard/overview'
+    | '/dashboard/simulatore'
     | '/dashboard/stato-patrimoniale'
     | '/admin/'
     | '/dashboard/'
@@ -368,6 +380,13 @@ declare module '@tanstack/react-router' {
       path: '/stato-patrimoniale'
       fullPath: '/dashboard/stato-patrimoniale'
       preLoaderRoute: typeof DashboardStatoPatrimonialeRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/simulatore': {
+      id: '/dashboard/simulatore'
+      path: '/simulatore'
+      fullPath: '/dashboard/simulatore'
+      preLoaderRoute: typeof DashboardSimulatoreRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/overview': {
@@ -551,6 +570,7 @@ interface DashboardRouteChildren {
   DashboardMastriniRoute: typeof DashboardMastriniRoute
   DashboardNoteRoute: typeof DashboardNoteRoute
   DashboardOverviewRoute: typeof DashboardOverviewRoute
+  DashboardSimulatoreRoute: typeof DashboardSimulatoreRoute
   DashboardStatoPatrimonialeRoute: typeof DashboardStatoPatrimonialeRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
@@ -562,6 +582,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardMastriniRoute: DashboardMastriniRoute,
   DashboardNoteRoute: DashboardNoteRoute,
   DashboardOverviewRoute: DashboardOverviewRoute,
+  DashboardSimulatoreRoute: DashboardSimulatoreRoute,
   DashboardStatoPatrimonialeRoute: DashboardStatoPatrimonialeRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }

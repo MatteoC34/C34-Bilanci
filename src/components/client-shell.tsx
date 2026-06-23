@@ -37,7 +37,7 @@ export function ClientShell({
   headerActions,
   children,
 }: {
-  client: { name: string; piva?: string | null; ateco?: string | null } | null;
+  client: { name: string; piva?: string | null; ateco?: string | null } | null | undefined;
   headerTitle: string;
   headerSubtitle?: string;
   headerActions?: ReactNode;
