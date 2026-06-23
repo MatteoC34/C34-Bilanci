@@ -59,26 +59,29 @@ export const createClient = createServerFn({ method: "POST" })
     z.object({
       name: z.string().min(1),
       piva: z.string().optional().nullable(),
-      email: z.string().email(),
+      email: z.string().email().optional().nullable(),
       tipo: z.enum(["pmi","startup_pre","startup_scale","holding","immobiliare"]),
       ateco: z.string().optional().nullable(),
+      send_invite: z.boolean().optional().default(false),
     }).parse(d),
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
+    const { send_invite, email, ...rest } = data;
+    const shouldInvite = !!send_invite && !!email;
     const { data: row, error } = await context.supabase
       .from("clients")
-      .insert({ ...data, invited_at: new Date().toISOString() })
+      .insert({ ...rest, email: email ?? null, invited_at: shouldInvite ? new Date().toISOString() : null })
       .select()
       .single();
     if (error) throw error;
-    // Send magic link via admin API
-    try {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      await supabaseAdmin.auth.admin.inviteUserByEmail(data.email);
-    } catch (e) {
-      // Non-fatal: client row was created
-      console.error("invite email failed", e);
+    if (shouldInvite) {
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        await supabaseAdmin.auth.admin.inviteUserByEmail(email!);
+      } catch (e) {
+        console.error("invite email failed", e);
+      }
     }
     return row;
   });
