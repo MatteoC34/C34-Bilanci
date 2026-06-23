@@ -27,7 +27,7 @@ import {
 import { toast } from "sonner";
 import { PageCard } from "@/components/page-card";
 
-export const Route = createFileRoute("/admin/clienti")({
+export const Route = createFileRoute("/admin/clienti/")({
   head: () => ({ meta: [{ title: "Clienti — Admin · Consulting/34" }] }),
   component: ClientiPage,
 });
