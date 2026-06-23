@@ -172,14 +172,26 @@ function InviteDialog() {
   const create = useServerFn(createClient);
   const qc = useQueryClient();
   const [form, setForm] = useState({ name: "", piva: "", email: "", tipo: "pmi", ateco: "" });
+  const [sendInvite, setSendInvite] = useState(false);
 
   const m = useMutation({
-    mutationFn: () => create({ data: { ...form, tipo: form.tipo as never } }),
+    mutationFn: () =>
+      create({
+        data: {
+          name: form.name,
+          piva: form.piva || null,
+          email: form.email || null,
+          ateco: form.ateco || null,
+          tipo: form.tipo as never,
+          send_invite: sendInvite,
+        },
+      }),
     onSuccess: () => {
-      toast.success("Cliente creato e invito inviato");
+      toast.success(sendInvite ? "Cliente creato e invito inviato" : "Cliente creato");
       qc.invalidateQueries({ queryKey: ["clients"] });
       setOpen(false);
       setForm({ name: "", piva: "", email: "", tipo: "pmi", ateco: "" });
+      setSendInvite(false);
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -187,14 +199,17 @@ function InviteDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm"><Plus className="h-4 w-4 mr-1" /> Invita Nuovo Cliente</Button>
+        <Button size="sm"><Plus className="h-4 w-4 mr-1" /> Nuovo cliente</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader><DialogTitle>Nuovo cliente</DialogTitle></DialogHeader>
         <div className="space-y-3">
           <div><Label>Nome cliente</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
           <div><Label>P.IVA</Label><Input value={form.piva} onChange={(e) => setForm({ ...form, piva: e.target.value })} /></div>
-          <div><Label>Email</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
+          <div>
+            <Label>Email <span className="text-muted-foreground font-normal">(opzionale)</span></Label>
+            <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+          </div>
           <div><Label>ATECO</Label><Input value={form.ateco} onChange={(e) => setForm({ ...form, ateco: e.target.value })} /></div>
           <div>
             <Label>Tipologia</Label>
@@ -209,11 +224,19 @@ function InviteDialog() {
               </SelectContent>
             </Select>
           </div>
+          <label className="flex items-center gap-2 pt-1 cursor-pointer">
+            <Checkbox
+              checked={sendInvite}
+              onCheckedChange={(v) => setSendInvite(v === true)}
+              disabled={!form.email}
+            />
+            <span className="text-sm">Invia invito al cliente via email</span>
+          </label>
         </div>
         <DialogFooter>
           <Button variant="ghost" onClick={() => setOpen(false)}>Annulla</Button>
-          <Button onClick={() => m.mutate()} disabled={m.isPending || !form.name || !form.email}>
-            {m.isPending ? "Invio…" : "Crea e invia invito"}
+          <Button onClick={() => m.mutate()} disabled={m.isPending || !form.name}>
+            {m.isPending ? "Salvo…" : sendInvite ? "Crea e invia invito" : "Crea cliente"}
           </Button>
         </DialogFooter>
       </DialogContent>
