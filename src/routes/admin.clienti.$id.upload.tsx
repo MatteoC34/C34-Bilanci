@@ -311,8 +311,8 @@ function UploadPage() {
                         size="icon"
                         className="text-destructive hover:text-destructive"
                         title="Elimina"
-                        disabled={deleteFileM.isPending}
-                        onClick={() => deleteFileM.mutate({ id: f.id, storage_path: f.storage_path })}
+                        disabled={deleteFileM.isPending || !f.storage_path}
+                        onClick={() => f.storage_path && deleteFileM.mutate({ id: f.id, storage_path: f.storage_path })}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
