@@ -2,14 +2,15 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { ArrowLeft, Cloud, FileSpreadsheet, FileText, Play, Upload as UploadIcon } from "lucide-react";
+import { ArrowLeft, Cloud, FileSpreadsheet, FileText, Loader2, Play, Upload as UploadIcon, AlertCircle } from "lucide-react";
 import { AdminShell } from "@/components/admin-shell";
 import { useRequireAuth } from "@/hooks/use-me";
-import { listUploadedFiles, recordUploadedFile, avviaRevisione, getClient } from "@/lib/portal.functions";
+import { listUploadedFiles, recordUploadedFile, getClient } from "@/lib/portal.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PageCard } from "@/components/page-card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -38,7 +39,6 @@ function UploadPage() {
   const qc = useQueryClient();
   const listFiles = useServerFn(listUploadedFiles);
   const recordFile = useServerFn(recordUploadedFile);
-  const avvia = useServerFn(avviaRevisione);
   const getC = useServerFn(getClient);
 
   const clientQ = useQuery({ queryKey: ["client", id, "name"], queryFn: () => getC({ data: { id } }) });
@@ -47,6 +47,8 @@ function UploadPage() {
   const [fileType, setFileType] = useState<"bilancio_verifica" | "mastrini" | "nota_integrativa">("bilancio_verifica");
   const [periodo, setPeriodo] = useState("2024");
   const [uploading, setUploading] = useState(false);
+  const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   async function handleUpload(file: File) {
     setUploading(true);
@@ -69,15 +71,31 @@ function UploadPage() {
   }
 
   const avviaM = useMutation({
-    mutationFn: () => avvia({ data: { client_id: id } }),
-    onSuccess: () => {
-      toast.success("Revisione completata");
+    mutationFn: async () => {
+      if (!selectedFileId) throw new Error("Nessun file selezionato");
+      const tipo = fileType === "mastrini" ? "mastrini" : "bilancio";
+      const { data, error } = await supabase.functions.invoke("parse-excel", {
+        body: { file_id: selectedFileId, client_id: id, tipo, periodo },
+      });
+      if (error) throw error;
+      return data as { rows_processed?: number } | null;
+    },
+    onMutate: () => setErrorMsg(null),
+    onSuccess: (data) => {
+      const n = data?.rows_processed ?? 0;
+      toast.success(`Revisione completata — ${n} righe elaborate`);
       qc.invalidateQueries({ queryKey: ["files", id] });
+    },
+    onError: (err: unknown) => {
+      const msg = err instanceof Error ? err.message : "Errore durante l'elaborazione";
+      setErrorMsg(msg);
+      toast.error(msg);
     },
   });
 
   const files = filesQ.data ?? [];
   const hasPending = files.some((f) => f.status === "pending");
+  const canStart = !!selectedFileId && !avviaM.isPending;
 
   return (
     <AdminShell
@@ -135,6 +153,13 @@ function UploadPage() {
       </div>
 
       <PageCard title="File rilevati — in attesa di revisione" className="mt-6">
+        {errorMsg && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Errore elaborazione</AlertTitle>
+            <AlertDescription>{errorMsg}</AlertDescription>
+          </Alert>
+        )}
         {filesQ.isLoading ? (
           <p className="text-sm text-muted-foreground py-6 text-center">Caricamento…</p>
         ) : files.length === 0 ? (
@@ -143,6 +168,7 @@ function UploadPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-[10px] uppercase tracking-wider text-muted-foreground border-b border-border">
+                <th className="py-2 px-3"></th>
                 <th className="py-2 px-3"></th>
                 <th className="py-2 px-3">Nome</th>
                 <th className="py-2 px-3">Tipo</th>
@@ -156,6 +182,15 @@ function UploadPage() {
                 const isExcel = /\.(xlsx|xls|csv)$/i.test(f.file_name);
                 return (
                   <tr key={f.id} className="border-b border-border/60">
+                    <td className="py-2 px-3">
+                      <input
+                        type="radio"
+                        name="selectedFile"
+                        checked={selectedFileId === f.id}
+                        onChange={() => setSelectedFileId(f.id)}
+                        aria-label={`Seleziona ${f.file_name}`}
+                      />
+                    </td>
                     <td className="py-2 px-3">
                       {isExcel ? <FileSpreadsheet className="h-4 w-4 text-success" /> : <FileText className="h-4 w-4 text-destructive" />}
                     </td>
@@ -177,9 +212,18 @@ function UploadPage() {
 
         {hasPending && (
           <div className="mt-6 flex justify-center">
-            <Button size="lg" onClick={() => avviaM.mutate()} disabled={avviaM.isPending}>
-              <Play className="h-4 w-4 mr-2" />
-              {avviaM.isPending ? "Elaborazione…" : "Avvia Revisione"}
+            <Button size="lg" onClick={() => avviaM.mutate()} disabled={!canStart}>
+              {avviaM.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Elaborazione…
+                </>
+              ) : (
+                <>
+                  <Play className="h-4 w-4 mr-2" />
+                  Avvia Revisione
+                </>
+              )}
             </Button>
           </div>
         )}
