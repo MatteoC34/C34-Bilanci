@@ -9,38 +9,351 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as DashboardStatoPatrimonialeRouteImport } from './routes/dashboard.stato-patrimoniale'
+import { Route as DashboardSimulatoreRouteImport } from './routes/dashboard.simulatore'
+import { Route as DashboardOverviewRouteImport } from './routes/dashboard.overview'
+import { Route as DashboardNoteRouteImport } from './routes/dashboard.note'
+import { Route as DashboardMastriniRouteImport } from './routes/dashboard.mastrini'
+import { Route as DashboardFiscaleRouteImport } from './routes/dashboard.fiscale'
+import { Route as DashboardContoEconomicoRouteImport } from './routes/dashboard.conto-economico'
+import { Route as DashboardBilanciRouteImport } from './routes/dashboard.bilanci'
+import { Route as AdminUploadRouteImport } from './routes/admin.upload'
+import { Route as AdminTemplateRouteImport } from './routes/admin.template'
+import { Route as AdminNoteRouteImport } from './routes/admin.note'
+import { Route as AdminInvitiRouteImport } from './routes/admin.inviti'
+import { Route as AdminImpostazioniRouteImport } from './routes/admin.impostazioni'
+import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
+import { Route as AdminClientiRouteImport } from './routes/admin.clienti'
+import { Route as AdminAlertRouteImport } from './routes/admin.alert'
+import { Route as AdminClientiIdRouteImport } from './routes/admin.clienti.$id'
+import { Route as AdminClientiIdUploadRouteImport } from './routes/admin.clienti.$id.upload'
+import { Route as AdminClientiIdNoteRouteImport } from './routes/admin.clienti.$id.note'
 
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const DashboardStatoPatrimonialeRoute =
+  DashboardStatoPatrimonialeRouteImport.update({
+    id: '/stato-patrimoniale',
+    path: '/stato-patrimoniale',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardSimulatoreRoute = DashboardSimulatoreRouteImport.update({
+  id: '/simulatore',
+  path: '/simulatore',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardOverviewRoute = DashboardOverviewRouteImport.update({
+  id: '/overview',
+  path: '/overview',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardNoteRoute = DashboardNoteRouteImport.update({
+  id: '/note',
+  path: '/note',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardMastriniRoute = DashboardMastriniRouteImport.update({
+  id: '/mastrini',
+  path: '/mastrini',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardFiscaleRoute = DashboardFiscaleRouteImport.update({
+  id: '/fiscale',
+  path: '/fiscale',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardContoEconomicoRoute = DashboardContoEconomicoRouteImport.update({
+  id: '/conto-economico',
+  path: '/conto-economico',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardBilanciRoute = DashboardBilanciRouteImport.update({
+  id: '/bilanci',
+  path: '/bilanci',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const AdminUploadRoute = AdminUploadRouteImport.update({
+  id: '/upload',
+  path: '/upload',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminTemplateRoute = AdminTemplateRouteImport.update({
+  id: '/template',
+  path: '/template',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminNoteRoute = AdminNoteRouteImport.update({
+  id: '/note',
+  path: '/note',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminInvitiRoute = AdminInvitiRouteImport.update({
+  id: '/inviti',
+  path: '/inviti',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminImpostazioniRoute = AdminImpostazioniRouteImport.update({
+  id: '/impostazioni',
+  path: '/impostazioni',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminClientiRoute = AdminClientiRouteImport.update({
+  id: '/clienti',
+  path: '/clienti',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAlertRoute = AdminAlertRouteImport.update({
+  id: '/alert',
+  path: '/alert',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminClientiIdRoute = AdminClientiIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AdminClientiRoute,
+} as any)
+const AdminClientiIdUploadRoute = AdminClientiIdUploadRouteImport.update({
+  id: '/upload',
+  path: '/upload',
+  getParentRoute: () => AdminClientiIdRoute,
+} as any)
+const AdminClientiIdNoteRoute = AdminClientiIdNoteRouteImport.update({
+  id: '/note',
+  path: '/note',
+  getParentRoute: () => AdminClientiIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/dashboard': typeof DashboardRouteWithChildren
+  '/admin/alert': typeof AdminAlertRoute
+  '/admin/clienti': typeof AdminClientiRouteWithChildren
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/impostazioni': typeof AdminImpostazioniRoute
+  '/admin/inviti': typeof AdminInvitiRoute
+  '/admin/note': typeof AdminNoteRoute
+  '/admin/template': typeof AdminTemplateRoute
+  '/admin/upload': typeof AdminUploadRoute
+  '/dashboard/bilanci': typeof DashboardBilanciRoute
+  '/dashboard/conto-economico': typeof DashboardContoEconomicoRoute
+  '/dashboard/fiscale': typeof DashboardFiscaleRoute
+  '/dashboard/mastrini': typeof DashboardMastriniRoute
+  '/dashboard/note': typeof DashboardNoteRoute
+  '/dashboard/overview': typeof DashboardOverviewRoute
+  '/dashboard/simulatore': typeof DashboardSimulatoreRoute
+  '/dashboard/stato-patrimoniale': typeof DashboardStatoPatrimonialeRoute
+  '/admin/': typeof AdminIndexRoute
+  '/dashboard/': typeof DashboardIndexRoute
+  '/admin/clienti/$id': typeof AdminClientiIdRouteWithChildren
+  '/admin/clienti/$id/note': typeof AdminClientiIdNoteRoute
+  '/admin/clienti/$id/upload': typeof AdminClientiIdUploadRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/admin/alert': typeof AdminAlertRoute
+  '/admin/clienti': typeof AdminClientiRouteWithChildren
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/impostazioni': typeof AdminImpostazioniRoute
+  '/admin/inviti': typeof AdminInvitiRoute
+  '/admin/note': typeof AdminNoteRoute
+  '/admin/template': typeof AdminTemplateRoute
+  '/admin/upload': typeof AdminUploadRoute
+  '/dashboard/bilanci': typeof DashboardBilanciRoute
+  '/dashboard/conto-economico': typeof DashboardContoEconomicoRoute
+  '/dashboard/fiscale': typeof DashboardFiscaleRoute
+  '/dashboard/mastrini': typeof DashboardMastriniRoute
+  '/dashboard/note': typeof DashboardNoteRoute
+  '/dashboard/overview': typeof DashboardOverviewRoute
+  '/dashboard/simulatore': typeof DashboardSimulatoreRoute
+  '/dashboard/stato-patrimoniale': typeof DashboardStatoPatrimonialeRoute
+  '/admin': typeof AdminIndexRoute
+  '/dashboard': typeof DashboardIndexRoute
+  '/admin/clienti/$id': typeof AdminClientiIdRouteWithChildren
+  '/admin/clienti/$id/note': typeof AdminClientiIdNoteRoute
+  '/admin/clienti/$id/upload': typeof AdminClientiIdUploadRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/dashboard': typeof DashboardRouteWithChildren
+  '/admin/alert': typeof AdminAlertRoute
+  '/admin/clienti': typeof AdminClientiRouteWithChildren
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/impostazioni': typeof AdminImpostazioniRoute
+  '/admin/inviti': typeof AdminInvitiRoute
+  '/admin/note': typeof AdminNoteRoute
+  '/admin/template': typeof AdminTemplateRoute
+  '/admin/upload': typeof AdminUploadRoute
+  '/dashboard/bilanci': typeof DashboardBilanciRoute
+  '/dashboard/conto-economico': typeof DashboardContoEconomicoRoute
+  '/dashboard/fiscale': typeof DashboardFiscaleRoute
+  '/dashboard/mastrini': typeof DashboardMastriniRoute
+  '/dashboard/note': typeof DashboardNoteRoute
+  '/dashboard/overview': typeof DashboardOverviewRoute
+  '/dashboard/simulatore': typeof DashboardSimulatoreRoute
+  '/dashboard/stato-patrimoniale': typeof DashboardStatoPatrimonialeRoute
+  '/admin/': typeof AdminIndexRoute
+  '/dashboard/': typeof DashboardIndexRoute
+  '/admin/clienti/$id': typeof AdminClientiIdRouteWithChildren
+  '/admin/clienti/$id/note': typeof AdminClientiIdNoteRoute
+  '/admin/clienti/$id/upload': typeof AdminClientiIdUploadRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/dashboard'
+    | '/admin/alert'
+    | '/admin/clienti'
+    | '/admin/dashboard'
+    | '/admin/impostazioni'
+    | '/admin/inviti'
+    | '/admin/note'
+    | '/admin/template'
+    | '/admin/upload'
+    | '/dashboard/bilanci'
+    | '/dashboard/conto-economico'
+    | '/dashboard/fiscale'
+    | '/dashboard/mastrini'
+    | '/dashboard/note'
+    | '/dashboard/overview'
+    | '/dashboard/simulatore'
+    | '/dashboard/stato-patrimoniale'
+    | '/admin/'
+    | '/dashboard/'
+    | '/admin/clienti/$id'
+    | '/admin/clienti/$id/note'
+    | '/admin/clienti/$id/upload'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/admin/alert'
+    | '/admin/clienti'
+    | '/admin/dashboard'
+    | '/admin/impostazioni'
+    | '/admin/inviti'
+    | '/admin/note'
+    | '/admin/template'
+    | '/admin/upload'
+    | '/dashboard/bilanci'
+    | '/dashboard/conto-economico'
+    | '/dashboard/fiscale'
+    | '/dashboard/mastrini'
+    | '/dashboard/note'
+    | '/dashboard/overview'
+    | '/dashboard/simulatore'
+    | '/dashboard/stato-patrimoniale'
+    | '/admin'
+    | '/dashboard'
+    | '/admin/clienti/$id'
+    | '/admin/clienti/$id/note'
+    | '/admin/clienti/$id/upload'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/dashboard'
+    | '/admin/alert'
+    | '/admin/clienti'
+    | '/admin/dashboard'
+    | '/admin/impostazioni'
+    | '/admin/inviti'
+    | '/admin/note'
+    | '/admin/template'
+    | '/admin/upload'
+    | '/dashboard/bilanci'
+    | '/dashboard/conto-economico'
+    | '/dashboard/fiscale'
+    | '/dashboard/mastrini'
+    | '/dashboard/note'
+    | '/dashboard/overview'
+    | '/dashboard/simulatore'
+    | '/dashboard/stato-patrimoniale'
+    | '/admin/'
+    | '/dashboard/'
+    | '/admin/clienti/$id'
+    | '/admin/clienti/$id/note'
+    | '/admin/clienti/$id/upload'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  DashboardRoute: typeof DashboardRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +361,242 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/dashboard/stato-patrimoniale': {
+      id: '/dashboard/stato-patrimoniale'
+      path: '/stato-patrimoniale'
+      fullPath: '/dashboard/stato-patrimoniale'
+      preLoaderRoute: typeof DashboardStatoPatrimonialeRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/simulatore': {
+      id: '/dashboard/simulatore'
+      path: '/simulatore'
+      fullPath: '/dashboard/simulatore'
+      preLoaderRoute: typeof DashboardSimulatoreRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/overview': {
+      id: '/dashboard/overview'
+      path: '/overview'
+      fullPath: '/dashboard/overview'
+      preLoaderRoute: typeof DashboardOverviewRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/note': {
+      id: '/dashboard/note'
+      path: '/note'
+      fullPath: '/dashboard/note'
+      preLoaderRoute: typeof DashboardNoteRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/mastrini': {
+      id: '/dashboard/mastrini'
+      path: '/mastrini'
+      fullPath: '/dashboard/mastrini'
+      preLoaderRoute: typeof DashboardMastriniRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/fiscale': {
+      id: '/dashboard/fiscale'
+      path: '/fiscale'
+      fullPath: '/dashboard/fiscale'
+      preLoaderRoute: typeof DashboardFiscaleRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/conto-economico': {
+      id: '/dashboard/conto-economico'
+      path: '/conto-economico'
+      fullPath: '/dashboard/conto-economico'
+      preLoaderRoute: typeof DashboardContoEconomicoRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/bilanci': {
+      id: '/dashboard/bilanci'
+      path: '/bilanci'
+      fullPath: '/dashboard/bilanci'
+      preLoaderRoute: typeof DashboardBilanciRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/admin/upload': {
+      id: '/admin/upload'
+      path: '/upload'
+      fullPath: '/admin/upload'
+      preLoaderRoute: typeof AdminUploadRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/template': {
+      id: '/admin/template'
+      path: '/template'
+      fullPath: '/admin/template'
+      preLoaderRoute: typeof AdminTemplateRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/note': {
+      id: '/admin/note'
+      path: '/note'
+      fullPath: '/admin/note'
+      preLoaderRoute: typeof AdminNoteRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/inviti': {
+      id: '/admin/inviti'
+      path: '/inviti'
+      fullPath: '/admin/inviti'
+      preLoaderRoute: typeof AdminInvitiRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/impostazioni': {
+      id: '/admin/impostazioni'
+      path: '/impostazioni'
+      fullPath: '/admin/impostazioni'
+      preLoaderRoute: typeof AdminImpostazioniRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/clienti': {
+      id: '/admin/clienti'
+      path: '/clienti'
+      fullPath: '/admin/clienti'
+      preLoaderRoute: typeof AdminClientiRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/alert': {
+      id: '/admin/alert'
+      path: '/alert'
+      fullPath: '/admin/alert'
+      preLoaderRoute: typeof AdminAlertRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/clienti/$id': {
+      id: '/admin/clienti/$id'
+      path: '/$id'
+      fullPath: '/admin/clienti/$id'
+      preLoaderRoute: typeof AdminClientiIdRouteImport
+      parentRoute: typeof AdminClientiRoute
+    }
+    '/admin/clienti/$id/upload': {
+      id: '/admin/clienti/$id/upload'
+      path: '/upload'
+      fullPath: '/admin/clienti/$id/upload'
+      preLoaderRoute: typeof AdminClientiIdUploadRouteImport
+      parentRoute: typeof AdminClientiIdRoute
+    }
+    '/admin/clienti/$id/note': {
+      id: '/admin/clienti/$id/note'
+      path: '/note'
+      fullPath: '/admin/clienti/$id/note'
+      preLoaderRoute: typeof AdminClientiIdNoteRouteImport
+      parentRoute: typeof AdminClientiIdRoute
+    }
   }
 }
 
+interface AdminClientiIdRouteChildren {
+  AdminClientiIdNoteRoute: typeof AdminClientiIdNoteRoute
+  AdminClientiIdUploadRoute: typeof AdminClientiIdUploadRoute
+}
+
+const AdminClientiIdRouteChildren: AdminClientiIdRouteChildren = {
+  AdminClientiIdNoteRoute: AdminClientiIdNoteRoute,
+  AdminClientiIdUploadRoute: AdminClientiIdUploadRoute,
+}
+
+const AdminClientiIdRouteWithChildren = AdminClientiIdRoute._addFileChildren(
+  AdminClientiIdRouteChildren,
+)
+
+interface AdminClientiRouteChildren {
+  AdminClientiIdRoute: typeof AdminClientiIdRouteWithChildren
+}
+
+const AdminClientiRouteChildren: AdminClientiRouteChildren = {
+  AdminClientiIdRoute: AdminClientiIdRouteWithChildren,
+}
+
+const AdminClientiRouteWithChildren = AdminClientiRoute._addFileChildren(
+  AdminClientiRouteChildren,
+)
+
+interface AdminRouteChildren {
+  AdminAlertRoute: typeof AdminAlertRoute
+  AdminClientiRoute: typeof AdminClientiRouteWithChildren
+  AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminImpostazioniRoute: typeof AdminImpostazioniRoute
+  AdminInvitiRoute: typeof AdminInvitiRoute
+  AdminNoteRoute: typeof AdminNoteRoute
+  AdminTemplateRoute: typeof AdminTemplateRoute
+  AdminUploadRoute: typeof AdminUploadRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAlertRoute: AdminAlertRoute,
+  AdminClientiRoute: AdminClientiRouteWithChildren,
+  AdminDashboardRoute: AdminDashboardRoute,
+  AdminImpostazioniRoute: AdminImpostazioniRoute,
+  AdminInvitiRoute: AdminInvitiRoute,
+  AdminNoteRoute: AdminNoteRoute,
+  AdminTemplateRoute: AdminTemplateRoute,
+  AdminUploadRoute: AdminUploadRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
+interface DashboardRouteChildren {
+  DashboardBilanciRoute: typeof DashboardBilanciRoute
+  DashboardContoEconomicoRoute: typeof DashboardContoEconomicoRoute
+  DashboardFiscaleRoute: typeof DashboardFiscaleRoute
+  DashboardMastriniRoute: typeof DashboardMastriniRoute
+  DashboardNoteRoute: typeof DashboardNoteRoute
+  DashboardOverviewRoute: typeof DashboardOverviewRoute
+  DashboardSimulatoreRoute: typeof DashboardSimulatoreRoute
+  DashboardStatoPatrimonialeRoute: typeof DashboardStatoPatrimonialeRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardBilanciRoute: DashboardBilanciRoute,
+  DashboardContoEconomicoRoute: DashboardContoEconomicoRoute,
+  DashboardFiscaleRoute: DashboardFiscaleRoute,
+  DashboardMastriniRoute: DashboardMastriniRoute,
+  DashboardNoteRoute: DashboardNoteRoute,
+  DashboardOverviewRoute: DashboardOverviewRoute,
+  DashboardSimulatoreRoute: DashboardSimulatoreRoute,
+  DashboardStatoPatrimonialeRoute: DashboardStatoPatrimonialeRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
+  AuthRoute: AuthRoute,
+  DashboardRoute: DashboardRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
