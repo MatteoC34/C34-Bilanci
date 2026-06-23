@@ -57,22 +57,29 @@ function UploadPage() {
 
   async function handleUpload(file: File) {
     setUploading(true);
-    const path = `${id}/${Date.now()}-${file.name}`;
-    const { error } = await supabase.storage.from("bilanci").upload(path, file, { upsert: false });
-    if (error) { toast.error(error.message); setUploading(false); return; }
-    await recordFile({
-      data: {
-        client_id: id,
-        file_name: file.name,
-        file_type: fileType,
-        periodo,
-        storage_path: path,
-        size_bytes: file.size,
-      },
-    });
-    toast.success("File caricato");
-    qc.invalidateQueries({ queryKey: ["files", id] });
-    setUploading(false);
+    try {
+      const path = `${id}/${Date.now()}-${file.name}`;
+      const { error } = await supabase.storage.from("bilanci").upload(path, file, { upsert: false });
+      if (error) throw error;
+      await recordFile({
+        data: {
+          client_id: id,
+          file_name: file.name,
+          file_type: fileType,
+          periodo,
+          storage_path: path,
+          size_bytes: file.size,
+        },
+      });
+      toast.success("File caricato");
+      qc.invalidateQueries({ queryKey: ["files", id] });
+    } catch (err) {
+      console.error("Upload error:", err);
+      const msg = err instanceof Error ? err.message : "Errore durante l'upload";
+      toast.error(msg);
+    } finally {
+      setUploading(false);
+    }
   }
 
   const avviaM = useMutation({
@@ -102,9 +109,33 @@ function UploadPage() {
   const hasPending = files.some((f) => f.status === "pending");
   const canStart = !!selectedFileId && !avviaM.isPending;
 
+  const clientName = clientQ.data?.client?.name ?? null;
+
+  if (clientQ.isLoading) {
+    return (
+      <AdminShell headerTitle="Caricamento…">
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        </div>
+      </AdminShell>
+    );
+  }
+
+  if (!clientName) {
+    return (
+      <AdminShell headerTitle="Cliente non trovato">
+        <PageCard>
+          <p className="text-sm text-muted-foreground">
+            Cliente non trovato o accesso non autorizzato.
+          </p>
+        </PageCard>
+      </AdminShell>
+    );
+  }
+
   return (
     <AdminShell
-      headerTitle={clientQ.data?.client.name ?? "Cliente"}
+      headerTitle={clientName}
       headerSubtitle="Upload bilanci e mastrini"
       headerActions={
         <Link to="/admin/clienti/$id" params={{ id }}>
