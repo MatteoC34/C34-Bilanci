@@ -161,8 +161,11 @@ function ClientiPage() {
                         <Link to="/admin/clienti/$id" params={{ id: c.id }} title="KPI">
                           <Button variant="ghost" size="icon"><ExternalLink className="h-4 w-4" /></Button>
                         </Link>
-                        <Link to="/admin/clienti/$id/upload" params={{ id: c.id }} title="Upload">
-                          <Button variant="ghost" size="icon"><UploadIcon className="h-4 w-4" /></Button>
+                        <Link to="/admin/clienti/$id/upload" params={{ id: c.id }}>
+                          <Button variant="outline" size="sm" className="gap-1.5">
+                            <UploadIcon className="h-3.5 w-3.5" />
+                            Upload
+                          </Button>
                         </Link>
                         <Link to="/admin/clienti/$id/note" params={{ id: c.id }} title="Note">
                           <Button variant="ghost" size="icon"><MessageSquare className="h-4 w-4" /></Button>
