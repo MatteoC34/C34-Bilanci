@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { ArrowLeft, Cloud, FileSpreadsheet, FileText, Loader2, Play, Upload as UploadIcon, AlertCircle } from "lucide-react";
+import { ArrowLeft, Cloud, FileSpreadsheet, FileText, Loader2, Play, Upload as UploadIcon, AlertCircle, ExternalLink, KeyRound } from "lucide-react";
 import { AdminShell } from "@/components/admin-shell";
 import { useRequireAuth } from "@/hooks/use-me";
 import { listUploadedFiles, recordUploadedFile, getClient } from "@/lib/portal.functions";
@@ -42,6 +42,11 @@ function UploadPage() {
   const getC = useServerFn(getClient);
 
   const clientQ = useQuery({ queryKey: ["client", id, "name"], queryFn: () => getC({ data: { id } }) });
+  const client = clientQ.data?.client as
+    | { name: string; drive_url?: string | null; sibill_api_key?: string | null }
+    | undefined;
+  const driveUrl = client?.drive_url ?? null;
+  const hasSibill = !!client?.sibill_api_key;
   const filesQ = useQuery({ queryKey: ["files", id], queryFn: () => listFiles({ data: { client_id: id } }) });
 
   const [fileType, setFileType] = useState<"bilancio_verifica" | "mastrini" | "nota_integrativa">("bilancio_verifica");
@@ -108,11 +113,53 @@ function UploadPage() {
       }
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <PageCard title="Google Drive" subtitle="Sincronizza una cartella per il rilevamento automatico">
-          <div className="rounded-md bg-muted/40 p-4 text-center">
-            <Cloud className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-            <Button variant="outline" size="sm" disabled>Connetti Google Drive</Button>
-            <p className="mt-2 text-xs text-muted-foreground">Disponibile prossimamente. Per ora usa l'upload manuale.</p>
+        <PageCard title="Google Drive" subtitle="Cartella condivisa con lo studio">
+          {driveUrl ? (
+            <div className="rounded-md bg-success/10 border border-success/30 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Cloud className="h-5 w-5 text-success" />
+                <span className="text-sm font-medium">Cartella Drive collegata — clicca per aprire</span>
+              </div>
+              <a
+                href={driveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs text-primary hover:underline break-all"
+              >
+                {driveUrl} <ExternalLink className="h-3 w-3 shrink-0" />
+              </a>
+              <div className="mt-3">
+                <Link to="/admin/clienti" title="Cambia link">
+                  <Button variant="outline" size="sm">Cambia link</Button>
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="rounded-md bg-muted/40 p-4 text-center">
+              <Cloud className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+              <p className="text-xs text-muted-foreground mb-2">Nessuna cartella collegata.</p>
+              <Link to="/admin/clienti">
+                <Button variant="outline" size="sm">Imposta link dalla scheda cliente</Button>
+              </Link>
+            </div>
+          )}
+          <div className="mt-3 rounded-md border border-border p-3 flex items-start gap-2">
+            <KeyRound className={cn("h-4 w-4 mt-0.5", hasSibill ? "text-success" : "text-muted-foreground")} />
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium">Sibill</span>
+                {hasSibill ? (
+                  <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-semibold bg-success/15 text-success">COLLEGATO</span>
+                ) : (
+                  <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-semibold bg-muted text-muted-foreground">NON CONFIGURATO</span>
+                )}
+              </div>
+              <p className="text-[11px] text-muted-foreground mt-1">
+                {hasSibill
+                  ? "API Key configurata · i dati bancari saranno disponibili nella prossima release"
+                  : "Imposta l'API Key dalla scheda cliente"}
+              </p>
+            </div>
           </div>
         </PageCard>
 

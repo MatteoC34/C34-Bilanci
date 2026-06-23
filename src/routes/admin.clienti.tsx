@@ -2,10 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Plus, Search, ExternalLink, Upload as UploadIcon, MessageSquare, Sparkles, FileText, Loader2 } from "lucide-react";
+import { Plus, Search, ExternalLink, Upload as UploadIcon, MessageSquare, Sparkles, FileText, Loader2, Trash2, Pencil, Eye, EyeOff } from "lucide-react";
 import { AdminShell } from "@/components/admin-shell";
 import { useRequireAuth } from "@/hooks/use-me";
-import { listClients, createClient, seedDemoData, parseVisura } from "@/lib/portal.functions";
+import { listClients, createClient, seedDemoData, parseVisura, updateClient, deleteClient } from "@/lib/portal.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +13,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { PageCard } from "@/components/page-card";
 
@@ -145,6 +155,8 @@ function ClientiPage() {
                     </td>
                     <td className="py-3 px-3">
                       <div className="flex items-center justify-end gap-1">
+                        <EditClientDialog client={c} />
+                        <DeleteClientDialog id={c.id} name={c.name} />
                         <Link to="/admin/clienti/$id" params={{ id: c.id }} title="KPI">
                           <Button variant="ghost" size="icon"><ExternalLink className="h-4 w-4" /></Button>
                         </Link>
@@ -241,6 +253,188 @@ function InviteDialog() {
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+type ClientRow = {
+  id: string;
+  name: string;
+  piva: string | null;
+  email: string | null;
+  ateco: string | null;
+  tipo: string;
+  sibill_api_key?: string | null;
+  drive_url?: string | null;
+};
+
+function EditClientDialog({ client }: { client: ClientRow }) {
+  const [open, setOpen] = useState(false);
+  const [showKey, setShowKey] = useState(false);
+  const update = useServerFn(updateClient);
+  const qc = useQueryClient();
+  const [form, setForm] = useState({
+    name: client.name ?? "",
+    piva: client.piva ?? "",
+    email: client.email ?? "",
+    ateco: client.ateco ?? "",
+    tipo: client.tipo ?? "pmi",
+    sibill_api_key: client.sibill_api_key ?? "",
+    drive_url: client.drive_url ?? "",
+  });
+
+  const m = useMutation({
+    mutationFn: () =>
+      update({
+        data: {
+          id: client.id,
+          name: form.name,
+          piva: form.piva || null,
+          email: form.email || null,
+          ateco: form.ateco || null,
+          tipo: form.tipo as never,
+          sibill_api_key: form.sibill_api_key || null,
+          drive_url: form.drive_url || null,
+        },
+      }),
+    onSuccess: () => {
+      toast.success("Cliente aggiornato");
+      qc.invalidateQueries({ queryKey: ["clients"] });
+      qc.invalidateQueries({ queryKey: ["client", client.id, "name"] });
+      setOpen(false);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => {
+      setOpen(v);
+      if (v) setForm({
+        name: client.name ?? "",
+        piva: client.piva ?? "",
+        email: client.email ?? "",
+        ateco: client.ateco ?? "",
+        tipo: client.tipo ?? "pmi",
+        sibill_api_key: client.sibill_api_key ?? "",
+        drive_url: client.drive_url ?? "",
+      });
+    }}>
+      <DialogTrigger asChild>
+        <Button variant="ghost" size="icon" title="Modifica"><Pencil className="h-4 w-4" /></Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-lg">
+        <DialogHeader><DialogTitle>Modifica cliente</DialogTitle></DialogHeader>
+        <div className="space-y-3">
+          <div><Label>Nome</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
+          <div className="grid grid-cols-2 gap-3">
+            <div><Label>P.IVA</Label><Input value={form.piva} onChange={(e) => setForm({ ...form, piva: e.target.value })} /></div>
+            <div><Label>ATECO</Label><Input value={form.ateco} onChange={(e) => setForm({ ...form, ateco: e.target.value })} /></div>
+          </div>
+          <div><Label>Email</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
+          <div>
+            <Label>Tipologia</Label>
+            <Select value={form.tipo} onValueChange={(v) => setForm({ ...form, tipo: v })}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="pmi">PMI Tradizionale</SelectItem>
+                <SelectItem value="startup_pre">Startup Pre-Revenue</SelectItem>
+                <SelectItem value="startup_scale">Startup in Scaling</SelectItem>
+                <SelectItem value="holding">Holding / Gruppo</SelectItem>
+                <SelectItem value="immobiliare">Società Immobiliare</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="border-t border-border pt-3 mt-2">
+            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Integrazioni</div>
+            <div className="space-y-3">
+              <div>
+                <Label>Sibill API Key</Label>
+                <div className="relative">
+                  <Input
+                    type={showKey ? "text" : "password"}
+                    value={form.sibill_api_key}
+                    onChange={(e) => setForm({ ...form, sibill_api_key: e.target.value })}
+                    placeholder="sk_..."
+                    className="pr-9"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowKey((s) => !s)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    aria-label={showKey ? "Nascondi" : "Mostra"}
+                  >
+                    {showKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+                <p className="text-[11px] text-muted-foreground mt-1">Chiave API del portale Sibill per questo cliente. Non condividerla.</p>
+              </div>
+              <div>
+                <Label>Link cartella Google Drive</Label>
+                <Input
+                  type="url"
+                  value={form.drive_url}
+                  onChange={(e) => setForm({ ...form, drive_url: e.target.value })}
+                  placeholder="https://drive.google.com/drive/folders/..."
+                />
+                <p className="text-[11px] text-muted-foreground mt-1">URL della cartella Drive condivisa con lo studio (es. https://drive.google.com/drive/folders/...)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => setOpen(false)}>Annulla</Button>
+          <Button onClick={() => m.mutate()} disabled={m.isPending || !form.name}>
+            {m.isPending ? "Salvo…" : "Salva modifiche"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function DeleteClientDialog({ id, name }: { id: string; name: string }) {
+  const [open, setOpen] = useState(false);
+  const del = useServerFn(deleteClient);
+  const qc = useQueryClient();
+  const m = useMutation({
+    mutationFn: () => del({ data: { id } }),
+    onSuccess: () => {
+      toast.success("Cliente eliminato");
+      qc.invalidateQueries({ queryKey: ["clients"] });
+      setOpen(false);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  return (
+    <AlertDialog open={open} onOpenChange={setOpen}>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="text-destructive hover:text-destructive"
+        title="Elimina"
+        onClick={() => setOpen(true)}
+      >
+        <Trash2 className="h-4 w-4" />
+      </Button>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Elimina {name}?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Questa azione eliminerà definitivamente il cliente e tutti i dati associati: bilanci, mastrini, KPI, note. Non è reversibile.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={m.isPending}>Annulla</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={(e) => { e.preventDefault(); m.mutate(); }}
+            disabled={m.isPending}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            {m.isPending ? "Elimino…" : "Elimina definitivamente"}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
 

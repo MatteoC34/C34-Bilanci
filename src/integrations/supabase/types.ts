@@ -114,31 +114,37 @@ export type Database = {
         Row: {
           ateco: string | null
           created_at: string
+          drive_url: string | null
           email: string | null
           id: string
           invited_at: string | null
           name: string
           piva: string | null
+          sibill_api_key: string | null
           tipo: Database["public"]["Enums"]["client_tipo"]
         }
         Insert: {
           ateco?: string | null
           created_at?: string
+          drive_url?: string | null
           email?: string | null
           id?: string
           invited_at?: string | null
           name: string
           piva?: string | null
+          sibill_api_key?: string | null
           tipo?: Database["public"]["Enums"]["client_tipo"]
         }
         Update: {
           ateco?: string | null
           created_at?: string
+          drive_url?: string | null
           email?: string | null
           id?: string
           invited_at?: string | null
           name?: string
           piva?: string | null
+          sibill_api_key?: string | null
           tipo?: Database["public"]["Enums"]["client_tipo"]
         }
         Relationships: []
@@ -342,38 +348,50 @@ export type Database = {
       uploaded_files: {
         Row: {
           client_id: string
+          errore: string | null
           file_name: string
           file_type: Database["public"]["Enums"]["file_type"]
           id: string
           periodo: string | null
+          righe_elaborate: number | null
           size_bytes: number | null
           source: string
           status: Database["public"]["Enums"]["file_status"]
           storage_path: string | null
+          totale_avere: number | null
+          totale_dare: number | null
           uploaded_at: string
         }
         Insert: {
           client_id: string
+          errore?: string | null
           file_name: string
           file_type: Database["public"]["Enums"]["file_type"]
           id?: string
           periodo?: string | null
+          righe_elaborate?: number | null
           size_bytes?: number | null
           source?: string
           status?: Database["public"]["Enums"]["file_status"]
           storage_path?: string | null
+          totale_avere?: number | null
+          totale_dare?: number | null
           uploaded_at?: string
         }
         Update: {
           client_id?: string
+          errore?: string | null
           file_name?: string
           file_type?: Database["public"]["Enums"]["file_type"]
           id?: string
           periodo?: string | null
+          righe_elaborate?: number | null
           size_bytes?: number | null
           source?: string
           status?: Database["public"]["Enums"]["file_status"]
           storage_path?: string | null
+          totale_avere?: number | null
+          totale_dare?: number | null
           uploaded_at?: string
         }
         Relationships: [

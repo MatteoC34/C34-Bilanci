@@ -181,6 +181,58 @@ export const updateClientTipo = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+// ── Elimina cliente e tutti i dati associati ──
+export const deleteClient = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin.from("advisor_notes").delete().eq("client_id", data.id);
+    await supabaseAdmin.from("kpi_snapshots").delete().eq("client_id", data.id);
+    await supabaseAdmin.from("trial_balance").delete().eq("client_id", data.id);
+    await supabaseAdmin.from("ledger_entries").delete().eq("client_id", data.id);
+    await supabaseAdmin.from("uploaded_files").delete().eq("client_id", data.id);
+    await supabaseAdmin.from("client_kpi_config").delete().eq("client_id", data.id);
+    await supabaseAdmin.from("client_users").delete().eq("client_id", data.id);
+    const { error } = await supabaseAdmin.from("clients").delete().eq("id", data.id);
+    if (error) throw error;
+    return { ok: true };
+  });
+
+// ── Modifica anagrafica + integrazioni cliente ──
+export const updateClient = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({
+      id: z.string().uuid(),
+      name: z.string().min(1),
+      piva: z.string().optional().nullable(),
+      email: z.string().optional().nullable(),
+      ateco: z.string().optional().nullable(),
+      tipo: z.enum(["pmi","startup_pre","startup_scale","holding","immobiliare"]),
+      sibill_api_key: z.string().optional().nullable(),
+      drive_url: z.string().url().optional().nullable().or(z.literal("")),
+    }).parse(d)
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { id, ...rest } = data;
+    const payload = {
+      ...rest,
+      email: rest.email || null,
+      drive_url: rest.drive_url || null,
+      sibill_api_key: rest.sibill_api_key || null,
+    };
+    const { error } = await supabaseAdmin
+      .from("clients")
+      .update(payload as never)
+      .eq("id", id);
+    if (error) throw error;
+    return { ok: true };
+  });
+
 // ============= KPI config =============
 export const upsertKpiConfig = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
