@@ -105,7 +105,18 @@ serve(async (req: Request) => {
     const differenza = Math.abs(totalDare - totalAvere);
     if (differenza > TOLERANCE) throw new Error(`Validazione fallita: differenza €${differenza.toFixed(2)}`);
     if (records.length === 0) throw new Error("Nessun dato estratto. Verificare il formato del file.");
-    await supabase.from(tableName).delete().eq("file_id", file_id);
+    if (tipo === "bilancio") {
+      // Sostituisci tutti i dati del periodo per questo cliente:
+      // ricaricare un bilancio dello stesso anno aggiorna i dati esistenti
+      // invece di accodarli a quelli del file precedente.
+      await supabase
+        .from("trial_balance")
+        .delete()
+        .eq("client_id", client_id)
+        .eq("periodo", periodo);
+    } else {
+      await supabase.from(tableName).delete().eq("file_id", file_id);
+    }
     const BATCH = 400;
     for (let i = 0; i < records.length; i += BATCH) {
       const { error: insertErr } = await supabase.from(tableName).insert(records.slice(i, i+BATCH));
